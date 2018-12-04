@@ -30,14 +30,14 @@ public class Catch extends Command{
 		}
 
 	@Override
-	public void execute(Controller control, Game g) {
+	public boolean execute(Game g) {
 		if (!g.catchSunEstate()) {
 			g.cogerSun(this.x, this.y);
-			control.changeIfPrint(true);
+			return true;
 		}
 		else
 			System.out.println("Ya has cogido un Sol este turno!\n");
-		//control.changeIfPrint(false);
+			return false;
 	}
 	
 	public String info(){

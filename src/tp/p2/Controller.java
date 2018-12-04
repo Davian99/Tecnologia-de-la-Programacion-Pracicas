@@ -1,8 +1,10 @@
 package tp.p2;
+import java.io.IOException;
 import java.util.Random;
 import java.util.Scanner;
 
 import tp.comand.*;
+import tp.excepciones.ParseException;
 
 public class Controller {
 	private Game g;
@@ -26,7 +28,7 @@ public class Controller {
 			this.random = new Random(0);
 		}
 		this.semilla = random.nextLong();
-		g = new Game(l, random);
+		g = new Game(l, random, Long.parseLong(args[1]));
 		scan = new Scanner(System.in);
 		run(g);
 	}
@@ -37,8 +39,9 @@ public class Controller {
 		String entrada;
 		//String[] entradaArray;
 		CommandParser parseador= new CommandParser();
+		Command comando = null;
 		//System.out.println(this.semilla);
-		while(!finPartida) {
+		while(!g.winner()) {
 			//Imprime el tablero y el promt command
 			if (print) 
 				g.printTablero();
@@ -47,16 +50,32 @@ public class Controller {
 			entrada = scan.nextLine();
 			entrada = entrada.toLowerCase();
 			//entradaArray = entrada.split(" ");
-			Command comando = parseador.parse(entrada);
-			if(comando != null)
-				comando.execute(this, this.g);
-			else {
-				System.out.println("Commando no reconocible");
+			try {
+				comando = parseador.parse(entrada);
+				changeIfPrint(comando.execute(this.g));
+					
+			} catch (ParseException  | NumberFormatException e) {
 				this.print = false;
+				e.printStackTrace();
+			} catch (IOException e) {
+				this.print = false;
+				e.printStackTrace();
 			}
-			if (g.winner())
-				finPartida = true;
 		}
+		
+		/*while (!game.isFinished()){
+System.out.print(prompt);
+String[] words = in.nextLine().trim(). split ("\\s+");
+try {
+Command command = CommandGenerator.parse(words);
+if (command != null) {
+if (command.execute(game)) printGame();
+} else
+System.out.println(unknownCommandMsg);
+} catch (CommandParseException | CommandExecuteException ex) {
+System.out.format(ex.getMessage() + " %n %n");
+}
+}*/
 	}
 	
 	
@@ -72,15 +91,8 @@ public class Controller {
 		this.print = a;
 	}
 
-	public void printInfo() {
-		CommandParser parseador = new CommandParser();
-		String str = parseador.helpAll();
-		System.out.println(str);
-	}
 
-	public void printListPlantas(){
-		System.out.println(this.g.listInfoPlanta());
-	}
+	
 	
 	public void printListZombies(){
 		System.out.println(this.g.listInfoZombie());

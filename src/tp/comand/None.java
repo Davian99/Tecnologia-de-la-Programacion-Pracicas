@@ -24,9 +24,9 @@ public class None extends Command{
 	}
 
 	@Override
-	public void execute(Controller control, Game game) {
+	public boolean execute(Game game) {
 		game.update();
-		control.changeIfPrint(true);
+		return true;
 	}
 	
 	public String info(){

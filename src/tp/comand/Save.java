@@ -31,7 +31,7 @@ public class Save extends Command{
 	}
 
 	@Override
-	public void execute(Controller control, Game g) {
+	public boolean execute(Game g) throws IOException {
 		File file = new File(fichero + extension);
 		try {
 			file.createNewFile();
@@ -42,11 +42,11 @@ public class Save extends Command{
 			bw.close();
 			System.out.println("Game successfully saved in file <" + fichero + ">.dat");
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			System.out.println("El nombre de archivo introducido no es válido.");
-			control.changeIfPrint(false);
+			throw new IOException ("El nombre de archivo introducido no es válido.");
 		}
+		return false;
 	}
+	
 
 	@Override
 	public String info() {

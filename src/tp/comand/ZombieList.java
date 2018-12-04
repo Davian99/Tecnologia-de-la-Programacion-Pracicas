@@ -21,9 +21,9 @@ public class ZombieList extends Command{
 		return new ZombieList();
 	}
 	
-	public void execute(Controller control, Game game) {
-		control.printListZombies();
-		control.changeIfPrint(false);
+	public boolean execute(Game game) {
+		System.out.println(game.listInfoZombie());
+		return false;
 	}
 	
 	public String info(){

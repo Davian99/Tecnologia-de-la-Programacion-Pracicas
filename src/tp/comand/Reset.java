@@ -23,8 +23,9 @@ public class Reset extends Command{
 	}
 
 	@Override
-	public void execute(Controller control, Game game) {
-		game.reset(control.getSemilla());
+	public boolean execute(Game game) {
+		game.reset();
+		return true;
 	}
 	
 	public String info(){

@@ -31,26 +31,25 @@ public class Load extends Command{
 	}
 
 	@Override
-	public void execute(Controller control, Game g) {
+	public boolean execute(Game g) throws IOException{
 		File file = new File(fichero + extension);
 		String linea;
-		try {
-			BufferedReader br = new BufferedReader(new FileReader(file));
-			linea = br.readLine();
-			if (linea.equals(this.cabecera)) {
+		
+		BufferedReader br = new BufferedReader(new FileReader(file));
+		if (br == null)
+			throw new FileNotFoundException("El archivo introducido no existe.");
+		linea = br.readLine();
+		if (linea.equals(this.cabecera)) {
+			try {
 				g.load(br);
-				control.changeIfPrint(true);
-			} else {
-				System.out.println("El archivo no es parte de un savegame.");
+				return true;
+			} catch (IOException e){
+				//throw new IOException ("El archivo es corrupto.");
+				e.printStackTrace();
 			}
-			
-		} catch (FileNotFoundException e) {
-			System.out.println("El archivo introducido no existe.");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
-
+		return false;
+		
 	}
 
 	@Override

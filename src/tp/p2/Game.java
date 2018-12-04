@@ -9,6 +9,7 @@ import tp.zombies.*;
 import tp.plantas.*;
 
 public class Game {
+	private boolean exit = false;
 	private int cicleCount;
 	private Random generador;
 	private Level nivel;
@@ -20,11 +21,13 @@ public class Game {
 	private int tamx, tamy;
 	private PrintMode printMode;
 	private boolean catchSun;
+	private long seed;
 	
 	//Constructora para cuando tenemos una semilla.
-	public Game(Level nivel, Random r) {
+	public Game(Level nivel, Random r, long semilla) {
 		this(nivel);
 		this.setGenerador(r);
+		this.seed = semilla;
 	}
 	
 	//Constructora con semilla por defecto.
@@ -47,14 +50,13 @@ public class Game {
 		this.tamx = 4;
 		this.tamy = 8;
 		cicleCount = 0;
-		setGenerador(new Random());
+		setGenerador(new Random(this.seed));
 		listaObjetos = new ListaGameObject(5);
 		pantallaR = new ReleasePrinter(tamx, tamy, 50);
 		pantallaD = new DebugPrinter(tamx, tamy, 50);
-		monedas = new SuncoinManager(50);
 		this.setCatchSun(false);
 	}
-
+	
 	//Hace el update del juego, osea hace la ejecución de un turno.
 	public void update() {
 		
@@ -93,6 +95,8 @@ public class Game {
 			System.out.println("Game Over\nZombies Wins");
 			return true;
 		}	
+		else if (exit)
+			return true;
 		else
 			return false;
 	}	
@@ -185,12 +189,7 @@ public class Game {
 		generadorZombie = new ZombieManager(nivel);
 		//pantalla= new GameprinterObs(4, 8, 50); //Modificar al gusto
 		monedas = new SuncoinManager(50);
-	}
-
-	//Metodo utilizado en controller que resetea el juego y cuando si tiene semilla.
-	public void reset(long seed){
-		this.reset();
-		this.setGenerador(new Random(seed));
+		this.setGenerador(new Random(this.seed));
 	}
 
 	public String printCasilla(int i, int j) {
@@ -373,28 +372,33 @@ public class Game {
 		return;
 	}
 
-	public void load(BufferedReader br) {
+	public void load(BufferedReader br) throws IOException {
 		Game g = new Game();
 		g.printMode = PrintMode.RELEASE;
 		try {
 			String aux, args[], objeto[], coma;
+			
 			//Ciclo
 			aux = br.readLine();
 			args = aux.split(" ");
 			g.cicleCount = Integer.parseInt(args[1]);
+			
 			//Monedas
 			aux = br.readLine();
 			args = aux.split(" ");
-			g.monedas.setSuncoins(Integer.parseInt(args[1]));
+			g.monedas = new SuncoinManager(Integer.parseInt(args[1]));
+			
 			//Level
 			aux = br.readLine();
 			args = aux.split(" ");
 			g.nivel = Level.valueOf(args[1].toUpperCase());
 			g.generadorZombie = new ZombieManager(g.nivel);
+		
 			//Zombies restantes
 			aux = br.readLine();
 			args = aux.split(" ");
 			g.generadorZombie.setZombies(Integer.parseInt(args[1]));
+			
 			//Lista de objetos activos
 			ListaGameObject lgo = new ListaGameObject(5);
 			aux = br.readLine();
@@ -444,13 +448,35 @@ public class Game {
 					++i;
 				}
 				g.listaObjetos = lgo;
+				
+				//Soles en tablero
+				aux = br.readLine();
+				args = aux.split(" ");
+				if (args.length > 1) {
+					int i1 = 1;
+					while (i1 < args.length) {
+						objeto = args[i1].split(":");
+						coma = objeto[2].substring(objeto[2].length()-1);
+						if (",".equals(coma))
+							objeto[2] = objeto[2].substring(0, objeto[2].length()-1);
+						if(g.monedas.casillaVacia(Integer.parseInt(objeto[1]), Integer.parseInt(objeto[2]))) {
+							g.monedas.aniadirSun(new Sun(Integer.parseInt(objeto[1]), Integer.parseInt(objeto[2]), g));
+						} else {
+							System.out.println("Suns en casillas iguales.");
+							return;
+						}		
+						++i1;
+					}
+				}
+				
 			}
 			resetWithGame(g);
 			
-		} catch (IOException e) {
+		} /*catch (IOException e) {
 			System.out.println("El archivo está corrupto.");
 		
-		} catch (NumberFormatException nfe) {
+		}*/
+		catch (NumberFormatException nfe) {
 			System.out.println("Algun número no es un número");
 			
 		} catch (IllegalArgumentException iae) {
@@ -459,5 +485,10 @@ public class Game {
 		} catch(ArrayIndexOutOfBoundsException aioobe) {
 			System.out.println("Falta informacion de algún objeto.");
 		}
+		//throw new IOException("El archivo esta corrupto");
+	}
+	
+	public void terminar() {
+		this.exit = true;
 	}
 }

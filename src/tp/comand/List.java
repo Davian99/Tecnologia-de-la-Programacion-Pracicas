@@ -21,13 +21,15 @@ public class List extends Command{
 		return new List();
 	}
 	
-	public void execute(Controller control, Game game) {
+	public boolean execute(Game game) {
 		
-		control.printListPlantas();
-		control.changeIfPrint(false);
+		System.out.println(game.listInfoPlanta());
+		return false;
 	}
 	
 	public String info(){
 		return "[L]ist: Muestra el nombre de las plantas disponibles y su coste\n";
 	}
+	
+	
 }

@@ -1,5 +1,7 @@
 package tp.comand;
 
+import tp.excepciones.ParseException;
+
 public class CommandParser {
 	
 	Command [] comandos={
@@ -17,14 +19,17 @@ public class CommandParser {
 	};	
 	
 
-	public Command parse(String instruccion){
+	public Command parse(String instruccion) throws ParseException{
 		Command objetivo = null;
 		int g = 0;
 		while(objetivo == null && g < comandos.length){
 			objetivo = comandos[g].parse(instruccion);
 			g++;
 		}
-		return objetivo;
+		if (objetivo == null)
+			throw new ParseException("No se ha encontrado el comando: " + instruccion);
+		else
+			return objetivo;
 	}
 	
 	

@@ -22,8 +22,9 @@ public class Exit extends Command{
 	}
 
 	@Override
-	public void execute(Controller control, Game g) {
-		control.terminar();
+	public boolean execute(Game g) {
+		g.terminar();
+		return false;
 	}
 	
 	public String info(){

@@ -22,13 +22,18 @@ public class Help extends Command{
 	}
 
 	@Override
-	public void execute(Controller control, Game game) {
-		
-		control.printInfo();
-		control.changeIfPrint(false);
+	public boolean execute(Game game) {
+		this.printInfo();
+		return false;
 	}
 	
 	public String info(){
 		return "[H]elp: ¿Tu que crees que hace don obvio?\n";
+	}
+	
+	public void printInfo() {
+		CommandParser parseador = new CommandParser();
+		String str = parseador.helpAll();
+		System.out.println(str);
 	}
 }

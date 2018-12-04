@@ -36,9 +36,9 @@ public class Print extends Command{
 	}
 
 	@Override
-	public void execute(Controller control, Game g) {
+	public boolean execute(Game g) {
 		g.changeGamePrinter(this.printMode);
-		control.changeIfPrint(true);
+		return true;
 	}
 	
 	public String info(){

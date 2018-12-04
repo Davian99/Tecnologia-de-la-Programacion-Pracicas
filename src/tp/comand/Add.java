@@ -32,13 +32,13 @@ public class Add extends Command{
 	}
 
 	@Override
-	public void execute(Controller control, Game g) {
+	public boolean execute(Game g) {
 		if (g.addPlanta(planta, x, y)) {
 			g.update();
-			control.changeIfPrint(true);
+			return true;
 		}
 		else
-			control.changeIfPrint(false);
+			return false;
 			
 	}
 
