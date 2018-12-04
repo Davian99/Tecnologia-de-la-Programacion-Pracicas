@@ -11,6 +11,5 @@ public class PlantsVSZombies {
 
 /*
 Cambios
-Eliminar el toStringD de todos los objetos y cambiar el boardToString de release para que ambos utilicen unicamente el simbolo del objeto
-Hacer la funcion dañarObjeto
+
  */

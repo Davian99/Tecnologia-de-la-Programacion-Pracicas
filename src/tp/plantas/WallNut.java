@@ -8,7 +8,7 @@ public class WallNut extends Planta {
 	
 	//Constructora de WallNut
 	public WallNut(int x, int y, Game game) {
-		super(x, y, 10, game, "");
+		super(x, y, 10, game, "W");
 		this.coste = 50;
 	}
 	

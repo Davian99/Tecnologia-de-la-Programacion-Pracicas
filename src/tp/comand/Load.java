@@ -3,16 +3,16 @@ package tp.comand;
 import java.io.*;
 import tp.p2.*;
 
-public class Save extends Command{
+public class Load extends Command{
 	private String fichero;
 	private final String extension = ".dat";
 	private final String cabecera = "Plants Vs Zombies v3.0";
 	
-	public Save(){
+	public Load(){
 		
 	}
 	
-	public Save(String fichero){
+	public Load(String fichero){
 		this.fichero = fichero;
 	}
 		
@@ -24,28 +24,35 @@ public class Save extends Command{
 		if(args.length != 2) 
 			return null;
 		
-		if (!args[0].equalsIgnoreCase("s") && !args[0].equalsIgnoreCase("save"))
+		if (!args[0].equalsIgnoreCase("l") && !args[0].equalsIgnoreCase("load"))
 			return null;
 		
-		return new Save(args[1]);	
+		return new Load(args[1]);	
 	}
 
 	@Override
 	public void execute(Controller control, Game g) {
 		File file = new File(fichero + extension);
+		String linea;
+		//Save s = new Save(fichero + extension);
+		//s.execute(control, g);
 		try {
-			file.createNewFile();
-			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-			bw.write(cabecera + "\n");
-			g.store(bw);
-			bw.write("\n");
-			bw.close();
-			System.out.println("Game successfully saved in file <" + fichero + ">.dat");
+			BufferedReader br = new BufferedReader(new FileReader(file));
+			linea = br.readLine();
+			if (linea.equals(this.cabecera)) {
+				g.load(br);
+				
+			} else {
+				System.out.println("El archivo no es parte de un savegame.");
+			}
+			
+		} catch (FileNotFoundException e) {
+			System.out.println("El archivo introducido no existe.");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			System.out.println("El nombre de archivo introducido no es válido.");
-			control.changeIfPrint(false);
+			e.printStackTrace();
 		}
+
 	}
 
 	@Override

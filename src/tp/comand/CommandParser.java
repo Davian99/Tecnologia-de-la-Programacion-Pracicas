@@ -12,7 +12,8 @@ public class CommandParser {
 			new Print(),
 			new ZombieList(),
 			new Catch(),
-			new Save()
+			new Save(),
+			new Load()
 	};	
 	
 

@@ -16,6 +16,10 @@ public class SuncoinManager {
 		n_elementos = 0;
 	}
 	
+	public void setSuncoins(int m) {
+		this.suncoins = m;
+	}
+	
 	//Metodo que suma suncoins.
 	public void aniadirSuncoin(int monedas){
 		this.suncoins += monedas;

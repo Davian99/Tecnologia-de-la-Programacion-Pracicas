@@ -1,5 +1,6 @@
 package tp.p2;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Random;
@@ -326,6 +327,21 @@ public class Game {
 		str.append(parseador.listAll());
 		return str.toString();
 	}
+	
+	public void resetWithGame(Game g) {
+		this.cicleCount = g.cicleCount;
+		this.generador = g.generador;
+		this.nivel = g.nivel;
+		this.listaObjetos = g.listaObjetos;
+		this.generadorZombie = g.generadorZombie;
+		this.pantallaD = g.pantallaD;
+		this.pantallaR = g.pantallaR;
+		this.monedas = g.monedas;
+		this.tamx = g.tamx;
+		this.tamy = g.tamy;
+		this.printMode = g.printMode;
+		this.catchSun = g.catchSun;
+	}
 
 	public void store(BufferedWriter bw) {
 		try {
@@ -341,10 +357,95 @@ public class Game {
 			e.printStackTrace();
 		}
 		
-		
 		return;
 	}
+
+	public void load(BufferedReader br) {
+		Game g = this;
+		String aux, args[], objeto[];
+		try {
+			//Ciclo
+			aux = br.readLine();
+			args = aux.split(" ");
+			this.cicleCount = Integer.parseInt(args[1]);
+			//Monedas
+			aux = br.readLine();
+			args = aux.split(" ");
+			this.monedas.setSuncoins(Integer.parseInt(args[1]));
+			//Level
+			aux = br.readLine();
+			args = aux.split(" ");
+			this.nivel = Level.valueOf(args[1].toUpperCase());
+			//Zombies restantes
+			aux = br.readLine();
+			args = aux.split(" ");
+			this.generadorZombie.setZombies(Integer.parseInt(args[1]));
+			//Lista de objetos activos
+			ListaGameObject lgo = new ListaGameObject(5);
+			aux = br.readLine();
+			args = aux.split(" ");
+			if (args.length > 1) {
+				int i = 1;
+				while(args[i].endsWith(",")) {
+					//this.addPlanta(, x, y)
+					//++i;
+				}
+			}
+			
+			
+			
+			
+			
+			
+		} catch (IOException e) {
+			this.resetWithGame(g);
+		} catch (NumberFormatException nfe) {
+			System.out.println("El archivo está corrupto.");
+			this.resetWithGame(g);
+		} catch (IllegalArgumentException iae) {
+			System.out.println("La dificultad está corrupta.");
+		} 
+		
+		
+		
+	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

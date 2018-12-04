@@ -23,6 +23,10 @@ public class ZombieManager {
 			this.prob = 0.3f;
 		}
 	}
+	
+	public void setZombies(int c) {
+		this.zombiesLeft = c;
+	}
 
 	//Metodo que devuelve los zombies que faltan por salir.
 	public int numZombies(){

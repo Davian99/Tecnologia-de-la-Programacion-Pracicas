@@ -1,8 +1,8 @@
 Plants Vs Zombies v3.0
-cycle: 6
-sunCoins: 10
+cycle: 5
+sunCoins: 500
 level: INSANE
 remZombies: 7
-activelist: S:1:0:0:0, B:8:1:6:3, S:1:1:0:0, R:2:3:4:1, R:2:0:5:1
-pasiveList: *:0:0, *:1:0, *:3:7
+activelist: B:8:1:6:4
+pasiveList: 
 
