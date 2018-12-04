@@ -42,7 +42,7 @@ public class CherryBomb extends Planta {
 	}
 	
 	public CherryBomb getPlanta(String name, int x, int y, Game g) {
-		if((name.equals("c") || name.equals("cherrybomb")) && g.suficientesSuncoins(this.coste))
+		if((name.equalsIgnoreCase("c") || name.equalsIgnoreCase("cherrybomb")) && g.suficientesSuncoins(this.coste))
 				return new CherryBomb(x, y, g);
 		return null;
 	}

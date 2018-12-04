@@ -34,14 +34,12 @@ public class Load extends Command{
 	public void execute(Controller control, Game g) {
 		File file = new File(fichero + extension);
 		String linea;
-		//Save s = new Save(fichero + extension);
-		//s.execute(control, g);
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(file));
 			linea = br.readLine();
 			if (linea.equals(this.cabecera)) {
 				g.load(br);
-				
+				control.changeIfPrint(true);
 			} else {
 				System.out.println("El archivo no es parte de un savegame.");
 			}

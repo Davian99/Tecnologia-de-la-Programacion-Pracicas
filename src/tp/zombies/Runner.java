@@ -19,7 +19,7 @@ public class Runner extends Zombie{
 	}
 	
 	public Zombie getZombie(String name, int x, int y, Game g){
-		if (name.equals("r"))
+		if (name.equalsIgnoreCase("r"))
 			return new Runner(x, y, g);
 		return null;
 	}

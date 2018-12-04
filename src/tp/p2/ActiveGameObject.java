@@ -28,6 +28,10 @@ public abstract class ActiveGameObject extends GameObject{
 		return this.vida;
 	}
 	
+	public void setTurno(int t) {
+		this.turno = t;
+	}
+	
 	abstract public void update();
 	abstract public int ciclesToExecute();
 

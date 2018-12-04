@@ -36,7 +36,7 @@ public class Peashooter extends Planta{
 	}
 	
 	public Peashooter getPlanta(String name, int x, int y, Game g) {
-		if (name.equals("p") || name.equals("peashooter")) {
+		if (name.equalsIgnoreCase("p") || name.equalsIgnoreCase("peashooter")) {
 			if (g.suficientesSuncoins(this.coste))
 				return new Peashooter(x, y, g);	
 		}

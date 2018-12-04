@@ -43,6 +43,18 @@ public class Game {
 		this.setCatchSun(false);
 	}
 	
+	public Game() {
+		this.tamx = 4;
+		this.tamy = 8;
+		cicleCount = 0;
+		setGenerador(new Random());
+		listaObjetos = new ListaGameObject(5);
+		pantallaR = new ReleasePrinter(tamx, tamy, 50);
+		pantallaD = new DebugPrinter(tamx, tamy, 50);
+		monedas = new SuncoinManager(50);
+		this.setCatchSun(false);
+	}
+
 	//Hace el update del juego, osea hace la ejecución de un turno.
 	public void update() {
 		
@@ -342,6 +354,7 @@ public class Game {
 		this.printMode = g.printMode;
 		this.catchSun = g.catchSun;
 	}
+	
 
 	public void store(BufferedWriter bw) {
 		try {
@@ -361,98 +374,90 @@ public class Game {
 	}
 
 	public void load(BufferedReader br) {
-		Game g = this;
-		String aux, args[], objeto[];
+		Game g = new Game();
+		g.printMode = PrintMode.RELEASE;
 		try {
+			String aux, args[], objeto[], coma;
 			//Ciclo
 			aux = br.readLine();
 			args = aux.split(" ");
-			this.cicleCount = Integer.parseInt(args[1]);
+			g.cicleCount = Integer.parseInt(args[1]);
 			//Monedas
 			aux = br.readLine();
 			args = aux.split(" ");
-			this.monedas.setSuncoins(Integer.parseInt(args[1]));
+			g.monedas.setSuncoins(Integer.parseInt(args[1]));
 			//Level
 			aux = br.readLine();
 			args = aux.split(" ");
-			this.nivel = Level.valueOf(args[1].toUpperCase());
+			g.nivel = Level.valueOf(args[1].toUpperCase());
+			g.generadorZombie = new ZombieManager(g.nivel);
 			//Zombies restantes
 			aux = br.readLine();
 			args = aux.split(" ");
-			this.generadorZombie.setZombies(Integer.parseInt(args[1]));
+			g.generadorZombie.setZombies(Integer.parseInt(args[1]));
 			//Lista de objetos activos
 			ListaGameObject lgo = new ListaGameObject(5);
 			aux = br.readLine();
 			args = aux.split(" ");
 			if (args.length > 1) {
 				int i = 1;
-				while(args[i].endsWith(",")) {
-					//this.addPlanta(, x, y)
-					//++i;
+				Planta p;
+				Zombie z;
+				while(i < args.length) {
+					objeto = args[i].split(":");
+					if (!lgo.estaEnCasilla(Integer.parseInt(objeto[2]), Integer.parseInt(objeto[3]))
+							&& Integer.parseInt(objeto[2]) < this.tamx && Integer.parseInt(objeto[2]) >= 0 
+							&& Integer.parseInt(objeto[3]) < this.tamy && Integer.parseInt(objeto[3]) >= 0) {
+						coma = objeto[4].substring(objeto[4].length()-1);
+						if (",".equals(coma))
+							objeto[4] = objeto[4].substring(0, objeto[4].length()-1);
+						FactoryPlanta plantaParser = new FactoryPlanta();
+						FactoryZombie zombieParser = new FactoryZombie();
+						p = plantaParser.parse(objeto[0], Integer.parseInt(objeto[2]), Integer.parseInt(objeto[3]), this);
+						if (p != null) {
+							if (Integer.parseInt(objeto[3]) == this.tamy) {
+								//Excepcion
+								System.out.println("Planta colocada en posicion ilegal.");
+								return;
+							} else {
+								p.turno = Integer.parseInt(objeto[4]);
+								p.vida = Integer.parseInt(objeto[1]);
+								lgo.aniadirPlanta(p);
+							}
+						} else {
+							z = zombieParser.parse(objeto[0], Integer.parseInt(objeto[2]), Integer.parseInt(objeto[3]), this);
+							if (z != null) {
+								z.turno = z.getAvanzar() - Integer.parseInt(objeto[4]);
+								z.vida = Integer.parseInt(objeto[1]);
+								lgo.aniadirZombie(z);
+							} else {
+								System.out.println("El archivo está corrupto.");
+							}
+						} 
+					}
+					else {
+						//Excepcion
+						System.out.println("El archivo contiene objetos en posiciones iguales.");
+						this.resetWithGame((Game) g);
+						return;
+					}
+					++i;
 				}
+				g.listaObjetos = lgo;
 			}
-			
-			
-			
-			
-			
+			resetWithGame(g);
 			
 		} catch (IOException e) {
-			this.resetWithGame(g);
-		} catch (NumberFormatException nfe) {
 			System.out.println("El archivo está corrupto.");
-			this.resetWithGame(g);
+		
+		} catch (NumberFormatException nfe) {
+			System.out.println("Algun número no es un número");
+			
 		} catch (IllegalArgumentException iae) {
-			System.out.println("La dificultad está corrupta.");
-		} 
+			System.out.println("La dificultad esta corrupta.");
 		
-		
-		
+		} catch(ArrayIndexOutOfBoundsException aioobe) {
+			System.out.println("Falta informacion de algún objeto.");
+		}
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

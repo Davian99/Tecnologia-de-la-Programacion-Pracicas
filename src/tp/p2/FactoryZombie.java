@@ -8,11 +8,11 @@ public class FactoryZombie {
 			new Buckethead()
 	};
 
-	public Zombie parse(String planta, int x, int y, Game game) {
+	public Zombie parse(String zombie, int x, int y, Game game) {
 		Zombie objetivo = null;
 		int i = 0;
 		while(objetivo == null && i < Factory.length) {
-			objetivo = Factory[i].getZombie(planta, x, y, game);
+			objetivo = Factory[i].getZombie(zombie, x, y, game);
 			i++;
 		}
 		return objetivo;

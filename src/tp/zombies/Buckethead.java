@@ -19,7 +19,7 @@ public class Buckethead extends Zombie{
 	}
 	
 	public Zombie getZombie(String name, int x, int y, Game g){
-		if (name.equals("b")) 
+		if (name.equalsIgnoreCase("b")) 
 			return new Buckethead(x, y, g);
 		return null;
 	}

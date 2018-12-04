@@ -4,13 +4,13 @@ import tp.p2.*;
 abstract public class Zombie extends ActiveGameObject{
 	
 	protected int damage;
-	protected int avanzar;
+	private int avanzar;
 	
 	//Constructora de Zombie
 	public Zombie(int x, int y, int vida, Game game, int turnos, String symbol) {
 		super(x, y, game, vida, 0, symbol);
 		this.damage = 1;
-		this.avanzar = turnos;
+		this.avanzar = turnos; 
 	}
 	
 	public Zombie() {
@@ -20,7 +20,7 @@ abstract public class Zombie extends ActiveGameObject{
 	//Metodo que hace el update de todos los zombies
 	public void update(){
 		this.turno++;	
-		if(this.turno % this.avanzar == 0 && this.turno != 0) {//Si le toca avanzar avanza.
+		if(this.turno % this.getAvanzar() == 0 && this.turno != 0) {//Si le toca avanzar avanza.
 			if(!this.avanza())
 				game.atacarPlanta(this.x, this.y-1, this.damage);
 		}
@@ -39,10 +39,14 @@ abstract public class Zombie extends ActiveGameObject{
 	}
 	
 	public int ciclesToExecute() {
-		return this.avanzar - (this.turno % this.avanzar);
+		return this.getAvanzar() - (this.turno % this.getAvanzar());
 	}
 	
 	public abstract Zombie getZombie(String name, int x, int y, Game g);
 
 	public abstract String infoZombie();
+
+	public int getAvanzar() {
+		return avanzar;
+	}
 }

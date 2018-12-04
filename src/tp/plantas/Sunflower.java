@@ -34,7 +34,7 @@ public class Sunflower extends Planta{
 	}
 	
 	public Sunflower getPlanta(String name, int x, int y, Game g) {
-		if ((name.equals("s") || name.equals("sunflower")) && g.suficientesSuncoins(this.coste)) 
+		if ((name.equalsIgnoreCase("s") || name.equalsIgnoreCase("sunflower")) && g.suficientesSuncoins(this.coste)) 
 				return new Sunflower(x, y, g);
 		return null;
 	}

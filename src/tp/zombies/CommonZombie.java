@@ -19,7 +19,7 @@ public class CommonZombie extends Zombie{
 	}
 	
 	public Zombie getZombie(String name, int x, int y, Game g){
-		if (name.equals("z"))	
+		if (name.equalsIgnoreCase("z"))	
 			return new CommonZombie(x, y, g);
 		return null;
 	}
