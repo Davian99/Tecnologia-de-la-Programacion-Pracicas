@@ -1,6 +1,13 @@
 package tp.comand;
 
 import java.io.*;
+
+import tp.excepciones.ArrayOutException;
+import tp.excepciones.FileContentsException;
+import tp.excepciones.IllegalObjectPosition;
+import tp.excepciones.NotAGameObjectException;
+import tp.excepciones.ParseException;
+import tp.excepciones.SamePosicionException;
 import tp.p2.*;
 
 public class Load extends Command{
@@ -31,30 +38,23 @@ public class Load extends Command{
 	}
 
 	@Override
-	public boolean execute(Game g) throws IOException{
+	public boolean execute(Game g) throws IOException, FileContentsException, ArrayOutException, SamePosicionException, NotAGameObjectException, IllegalObjectPosition, ParseException {
 		File file = new File(fichero + extension);
 		String linea;
 		
 		BufferedReader br = new BufferedReader(new FileReader(file));
-		if (br == null)
-			throw new FileNotFoundException("El archivo introducido no existe.");
 		linea = br.readLine();
-		if (linea.equals(this.cabecera)) {
-			try {
-				g.load(br);
-				return true;
-			} catch (IOException e){
-				//throw new IOException ("El archivo es corrupto.");
-				e.printStackTrace();
-			}
+		if (!linea.equals(this.cabecera)) {
+			br.close();
+			throw new FileContentsException("El archivo no es un savegame de Plants Vs Zombies v3.0");		
 		}
-		return false;
-		
+		g.load(br);
+		br.close();
+		return true;
 	}
 
 	@Override
 	public String info() {
-		// TODO Auto-generated method stub
-		return null;
+		return "[L]oad <nombre archivo>: carga la partida guardada en el archivo dado.";
 	}
 }

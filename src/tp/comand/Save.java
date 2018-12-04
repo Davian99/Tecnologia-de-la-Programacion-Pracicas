@@ -50,7 +50,6 @@ public class Save extends Command{
 
 	@Override
 	public String info() {
-		// TODO Auto-generated method stub
-		return null;
+		return "[S]ave <nombre archivo>: guarda tu partida en el archivo dado.";
 	}
 }

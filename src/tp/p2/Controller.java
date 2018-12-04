@@ -1,10 +1,10 @@
 package tp.p2;
-import java.io.IOException;
+import java.io.*;
 import java.util.Random;
 import java.util.Scanner;
 
 import tp.comand.*;
-import tp.excepciones.ParseException;
+import tp.excepciones.*;
 
 public class Controller {
 	private Game g;
@@ -12,7 +12,6 @@ public class Controller {
 	private Scanner scan;
 	private Random random;
 	private Long semilla;
-	private boolean finPartida = false;
 	private boolean print = true;
 	
 	//Constructora del controller
@@ -54,33 +53,33 @@ public class Controller {
 				comando = parseador.parse(entrada);
 				changeIfPrint(comando.execute(this.g));
 					
-			} catch (ParseException  | NumberFormatException e) {
+			} catch (ParseException e) {
 				this.print = false;
-				e.printStackTrace();
+				System.out.println(e.getMessage());
+			
+			} catch(FileContentsException e) {
+				System.out.println(e.getMessage());
+			
+			} catch (FileNotFoundException  e) {
+				this.print = false;
+				System.out.println(e.getMessage());
+			
 			} catch (IOException e) {
-				this.print = false;
-				e.printStackTrace();
+				System.out.println(e.getMessage());
+			
+			} catch (ArrayOutException e) {
+				System.out.println(e.getMessage());
+			
+			} catch (SamePosicionException e) {
+				System.out.println(e.getMessage());
+			
+			} catch (NotAGameObjectException e) {
+				System.out.println(e.getMessage());
+			
+			} catch (IllegalObjectPosition e) {
+				System.out.println(e.getMessage());
 			}
 		}
-		
-		/*while (!game.isFinished()){
-System.out.print(prompt);
-String[] words = in.nextLine().trim(). split ("\\s+");
-try {
-Command command = CommandGenerator.parse(words);
-if (command != null) {
-if (command.execute(game)) printGame();
-} else
-System.out.println(unknownCommandMsg);
-} catch (CommandParseException | CommandExecuteException ex) {
-System.out.format(ex.getMessage() + " %n %n");
-}
-}*/
-	}
-	
-	
-	public void terminar() {
-		this.finPartida = true;
 	}
 	
 	public long getSemilla() {
@@ -91,9 +90,6 @@ System.out.format(ex.getMessage() + " %n %n");
 		this.print = a;
 	}
 
-
-	
-	
 	public void printListZombies(){
 		System.out.println(this.g.listInfoZombie());
 	}

@@ -6,6 +6,11 @@ import java.io.IOException;
 import java.util.Random;
 import tp.printer.*;
 import tp.zombies.*;
+import tp.excepciones.ArrayOutException;
+import tp.excepciones.IllegalObjectPosition;
+import tp.excepciones.NotAGameObjectException;
+import tp.excepciones.ParseException;
+import tp.excepciones.SamePosicionException;
 import tp.plantas.*;
 
 public class Game {
@@ -372,7 +377,7 @@ public class Game {
 		return;
 	}
 
-	public void load(BufferedReader br) throws IOException {
+	public void load(BufferedReader br) throws IOException, ArrayOutException, SamePosicionException, NotAGameObjectException, IllegalObjectPosition, ParseException {
 		Game g = new Game();
 		g.printMode = PrintMode.RELEASE;
 		try {
@@ -420,9 +425,7 @@ public class Game {
 						p = plantaParser.parse(objeto[0], Integer.parseInt(objeto[2]), Integer.parseInt(objeto[3]), this);
 						if (p != null) {
 							if (Integer.parseInt(objeto[3]) == this.tamy) {
-								//Excepcion
-								System.out.println("Planta colocada en posicion ilegal.");
-								return;
+								throw new IllegalObjectPosition("Planta colocada en posicion ilegal.");
 							} else {
 								p.turno = Integer.parseInt(objeto[4]);
 								p.vida = Integer.parseInt(objeto[1]);
@@ -435,15 +438,13 @@ public class Game {
 								z.vida = Integer.parseInt(objeto[1]);
 								lgo.aniadirZombie(z);
 							} else {
-								System.out.println("El archivo está corrupto.");
+								throw new NotAGameObjectException("Hay un objeto cuyo simbolo no pertenece al juego.");
 							}
 						} 
 					}
 					else {
 						//Excepcion
-						System.out.println("El archivo contiene objetos en posiciones iguales.");
-						this.resetWithGame((Game) g);
-						return;
+						throw new SamePosicionException("El archivo contiene objetos en posiciones iguales.");
 					}
 					++i;
 				}
@@ -461,10 +462,8 @@ public class Game {
 							objeto[2] = objeto[2].substring(0, objeto[2].length()-1);
 						if(g.monedas.casillaVacia(Integer.parseInt(objeto[1]), Integer.parseInt(objeto[2]))) {
 							g.monedas.aniadirSun(new Sun(Integer.parseInt(objeto[1]), Integer.parseInt(objeto[2]), g));
-						} else {
-							System.out.println("Suns en casillas iguales.");
-							return;
-						}		
+						} else
+							throw new SamePosicionException("El archivo contiene objetos en posiciones iguales.");		
 						++i1;
 					}
 				}
@@ -472,20 +471,19 @@ public class Game {
 			}
 			resetWithGame(g);
 			
-		} /*catch (IOException e) {
-			System.out.println("El archivo está corrupto.");
+		} catch (IOException e) {
+			throw new IOException("El archivo esta corrupto");
 		
-		}*/
-		catch (NumberFormatException nfe) {
-			System.out.println("Algun número no es un número");
-			
+		} catch (NumberFormatException nfe) {
+			throw new ParseException("Algun número no es un número");
+		
 		} catch (IllegalArgumentException iae) {
-			System.out.println("La dificultad esta corrupta.");
+			throw new IllegalArgumentException("La dificultad esta corrupta.");
 		
 		} catch(ArrayIndexOutOfBoundsException aioobe) {
-			System.out.println("Falta informacion de algún objeto.");
+			throw new ArrayOutException("Falta informacion.");
+		
 		}
-		//throw new IOException("El archivo esta corrupto");
 	}
 	
 	public void terminar() {
