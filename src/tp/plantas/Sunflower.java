@@ -42,4 +42,10 @@ public class Sunflower extends Planta{
 	public String infoPlanta(){
 		return "[S]unflower: Cost: 20 suncoins Harm: 0 Life: 1\n";
 	}
+
+	@Override
+	public String toStringFull() {
+		// TODO Auto-generated method stub
+		return "Sunflower";
+	}
 }

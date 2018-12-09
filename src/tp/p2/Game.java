@@ -7,9 +7,9 @@ import java.util.Random;
 import tp.printer.*;
 import tp.zombies.*;
 import tp.excepciones.ArrayOutException;
-import tp.excepciones.IllegalObjectPosition;
-import tp.excepciones.NotAGameObjectException;
-import tp.excepciones.ParseException;
+import tp.excepciones.NoSuncoinsException;
+import tp.excepciones.CommandParseException;
+import tp.excepciones.FileContentsException;
 import tp.excepciones.SamePosicionException;
 import tp.plantas.*;
 
@@ -63,7 +63,7 @@ public class Game {
 	}
 	
 	//Hace el update del juego, osea hace la ejecución de un turno.
-	public void update() {
+	public void update() throws CommandParseException {
 		
 		//Hacemos el update de todos los objetos de la lista, llamando a un update que se 
 		//Sobreescribe por el update de cada subclase
@@ -186,15 +186,18 @@ public class Game {
 		}
 	}
 	
-	//Metodo utilizado en controller que resetea el juego y cuando no tiene semilla.
+	//Metodo utilizado que resetea el juego.
 	public void reset(){
+		
+		System.out.println("Level: "+this.nivel);
+		System.out.println("Semilla: "+this.seed);
 		cicleCount = 0;
-		setGenerador(new Random());
+		this.setGenerador(new Random(this.seed));
 		listaObjetos = new ListaGameObject(5);
 		generadorZombie = new ZombieManager(nivel);
 		//pantalla= new GameprinterObs(4, 8, 50); //Modificar al gusto
 		monedas = new SuncoinManager(50);
-		this.setGenerador(new Random(this.seed));
+		//this.setGenerador(new Random(this.seed));
 	}
 
 	public String printCasilla(int i, int j) {
@@ -213,38 +216,27 @@ public class Game {
 		return this.printMode;
 	}
 	
-	public boolean addPlanta(String planta, int x, int y) {
-		FactoryPlanta parseador = new FactoryPlanta();
-		Planta p;
+	public boolean addPlanta(Planta p, int x, int y) throws ArrayOutException, NoSuncoinsException, SamePosicionException {
+		
 		if (x >= this.tamx || x < 0 || y >= this.tamy-1 || y < 0) {
-			System.out.println("La casilla introducida esta fuera del dominio\n");
-			return false;
+			throw new ArrayOutException("Failed to add " + p.toStringFull() + ": (" + x + ", " + y + ") is an invalid position.");
 		}
 		if(this.casillaVacia(x, y)) {
-			p = parseador.parse(planta, x, y, this);
-			if(p != null) {
 				if (this.suficientesSuncoins(p.getCoste())) {
 					this.listaObjetos.aniadirPlanta(p);
 					return true;
 				}
-				System.out.println("No tienes suficientes SunCoins\n");
-				return false;
-			}
-				
-			else {
-				System.out.println("No se reconocio la planta\n");
-				return false;
-			}
+				throw new NoSuncoinsException("Failed to add " + p.toStringFull() + ": not enough suncoins to buy it.");
+
 		}
-		System.out.println("La casilla ya esta ocupada\n");
-		return false;
+		throw new SamePosicionException("Failed to add " + p.toStringFull() + ":  position (" + x + ", " + y + ") is already occupied.");
 	}
 	
 	public void changeGamePrinter(PrintMode change) {
 		this.printMode = change;
 	}
 
-	public void addZombie(String zombie){
+	public void addZombie(String zombie) throws CommandParseException{
 		
 		FactoryZombie parseador = new FactoryZombie();
 		Zombie z;
@@ -377,7 +369,7 @@ public class Game {
 		return;
 	}
 
-	public void load(BufferedReader br) throws IOException, ArrayOutException, SamePosicionException, NotAGameObjectException, IllegalObjectPosition, ParseException {
+	public void load(BufferedReader br) throws FileContentsException {
 		Game g = new Game();
 		g.printMode = PrintMode.RELEASE;
 		try {
@@ -422,66 +414,67 @@ public class Game {
 							objeto[4] = objeto[4].substring(0, objeto[4].length()-1);
 						FactoryPlanta plantaParser = new FactoryPlanta();
 						FactoryZombie zombieParser = new FactoryZombie();
-						p = plantaParser.parse(objeto[0], Integer.parseInt(objeto[2]), Integer.parseInt(objeto[3]), this);
-						if (p != null) {
+						try {
+							p = plantaParser.parse(objeto[0], Integer.parseInt(objeto[2]), Integer.parseInt(objeto[3]), this);
 							if (Integer.parseInt(objeto[3]) == this.tamy) {
-								throw new IllegalObjectPosition("Planta colocada en posicion ilegal.");
+								throw new FileContentsException("Load failed: invalid file contents");
 							} else {
 								p.turno = Integer.parseInt(objeto[4]);
 								p.vida = Integer.parseInt(objeto[1]);
 								lgo.aniadirPlanta(p);
 							}
-						} else {
-							z = zombieParser.parse(objeto[0], Integer.parseInt(objeto[2]), Integer.parseInt(objeto[3]), this);
-							if (z != null) {
-								z.turno = z.getAvanzar() - Integer.parseInt(objeto[4]);
-								z.vida = Integer.parseInt(objeto[1]);
-								lgo.aniadirZombie(z);
-							} else {
-								throw new NotAGameObjectException("Hay un objeto cuyo simbolo no pertenece al juego.");
+						} catch (CommandParseException e) {
+							try {
+									z = zombieParser.parse(objeto[0], Integer.parseInt(objeto[2]), Integer.parseInt(objeto[3]), this);
+									z.turno = z.getAvanzar() - Integer.parseInt(objeto[4]);
+									z.vida = Integer.parseInt(objeto[1]);
+									lgo.aniadirZombie(z);
+								} catch (CommandParseException e1){
+									throw new FileContentsException("Load failed: invalid file contents");
+								}
 							}
-						} 
-					}
+						}
 					else {
 						//Excepcion
-						throw new SamePosicionException("El archivo contiene objetos en posiciones iguales.");
+						throw new FileContentsException("Load failed: invalid file contents");
 					}
 					++i;
 				}
 				g.listaObjetos = lgo;
 				
-				//Soles en tablero
-				aux = br.readLine();
-				args = aux.split(" ");
-				if (args.length > 1) {
-					int i1 = 1;
-					while (i1 < args.length) {
-						objeto = args[i1].split(":");
-						coma = objeto[2].substring(objeto[2].length()-1);
-						if (",".equals(coma))
-							objeto[2] = objeto[2].substring(0, objeto[2].length()-1);
-						if(g.monedas.casillaVacia(Integer.parseInt(objeto[1]), Integer.parseInt(objeto[2]))) {
-							g.monedas.aniadirSun(new Sun(Integer.parseInt(objeto[1]), Integer.parseInt(objeto[2]), g));
-						} else
-							throw new SamePosicionException("El archivo contiene objetos en posiciones iguales.");		
-						++i1;
-					}
-				}
-				
 			}
+			
+			//Soles en tablero
+			aux = br.readLine();
+			args = aux.split(" ");
+			if (args.length > 1) {
+				int i1 = 1;
+				while (i1 < args.length) {
+					objeto = args[i1].split(":");
+					coma = objeto[2].substring(objeto[2].length()-1);
+					if (",".equals(coma))
+						objeto[2] = objeto[2].substring(0, objeto[2].length()-1);
+					if(g.monedas.casillaVacia(Integer.parseInt(objeto[1]), Integer.parseInt(objeto[2]))) {
+						g.monedas.aniadirSun(new Sun(Integer.parseInt(objeto[1]), Integer.parseInt(objeto[2]), g));
+					} else
+						throw new FileContentsException("Load failed: invalid file contents");
+					++i1;
+				}
+			}
+			
 			resetWithGame(g);
 			
 		} catch (IOException e) {
-			throw new IOException("El archivo esta corrupto");
+			throw new FileContentsException("Load failed: invalid file contents");
 		
 		} catch (NumberFormatException nfe) {
-			throw new ParseException("Algun número no es un número");
+			throw new FileContentsException("Load failed: invalid file contents");
 		
 		} catch (IllegalArgumentException iae) {
-			throw new IllegalArgumentException("La dificultad esta corrupta.");
+			throw new FileContentsException("Load failed: invalid file contents");
 		
 		} catch(ArrayIndexOutOfBoundsException aioobe) {
-			throw new ArrayOutException("Falta informacion.");
+			throw new FileContentsException("Load failed: invalid file contents");
 		
 		}
 	}

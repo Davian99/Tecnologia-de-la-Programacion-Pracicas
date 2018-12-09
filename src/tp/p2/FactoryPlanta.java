@@ -1,4 +1,5 @@
 package tp.p2;
+import tp.excepciones.CommandParseException;
 import tp.plantas.*;
 
 public class FactoryPlanta {
@@ -9,14 +10,17 @@ public class FactoryPlanta {
 			new WallNut()
 	};
 
-	public Planta parse(String planta, int x, int y, Game game) {
+	public Planta parse(String planta, int x, int y, Game game) throws CommandParseException {
 		Planta objetivo = null;
 		int i = 0;
 		while(objetivo == null && i < Factory.length) {
 			objetivo = Factory[i].getPlanta(planta, x, y, game);
 			i++;
 		}
-		return objetivo;
+		if (objetivo == null)
+			throw new CommandParseException("Unknown plant name: " + planta);
+		else
+			return objetivo;
 	}
 	
 	public String listAll() {

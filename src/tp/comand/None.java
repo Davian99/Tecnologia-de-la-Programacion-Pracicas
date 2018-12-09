@@ -1,5 +1,6 @@
 package tp.comand;
 
+import tp.excepciones.CommandParseException;
 import tp.p2.*;
 
 public class None extends Command{
@@ -10,22 +11,27 @@ public class None extends Command{
 		
 		
 	@Override
-	public Command parse(String argumentos) {	
+	public Command parse(String argumentos) throws CommandParseException {	
 		
 		String[] args = argumentos.split(" ");
 		
-		if(args.length != 1)
-			return null;
-		
 		if (!args[0].equalsIgnoreCase("n") && !args[0].equalsIgnoreCase("none") && !args[0].equalsIgnoreCase(""))
 			return null;
+		
+		if(args.length != 1)
+			throw new CommandParseException("Incorrect number of arguments for none command: [N]one");
 		
 		return new None();
 	}
 
 	@Override
 	public boolean execute(Game game) {
-		game.update();
+		try {
+			game.update();
+		} catch (CommandParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return true;
 	}
 	

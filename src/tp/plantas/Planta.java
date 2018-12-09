@@ -20,4 +20,6 @@ public abstract class Planta extends ActiveGameObject{
 	public abstract Planta getPlanta(String name, int x, int y, Game g);
 
 	public abstract String infoPlanta();
+	
+	public abstract String toStringFull();
 }

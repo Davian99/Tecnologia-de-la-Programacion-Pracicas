@@ -1,4 +1,5 @@
 package tp.comand;
+import tp.excepciones.CommandParseException;
 import tp.p2.*;
 
 public class ZombieList extends Command{
@@ -8,15 +9,17 @@ public class ZombieList extends Command{
 	}
 	
 	
-	public Command parse(String argumentos) {	
+	public Command parse(String argumentos) throws CommandParseException {	
 		
 		String[] args = argumentos.split(" ");
 		
-		if(args.length != 1)
-			return null;
+		
 		
 		if (!args[0].equalsIgnoreCase("zl") && !args[0].equalsIgnoreCase("zombielist"))
 			return null;
+		
+		if(args.length != 1)
+			throw new CommandParseException("Incorrect number of arguments for Save command: [Z]ombie[L]ist");
 		
 		return new ZombieList();
 	}

@@ -46,4 +46,10 @@ public class Peashooter extends Planta{
 	public String infoPlanta(){
 		return "[P]eashooter: Cost: 50 suncoins Harm: 1 Life: 5\n";
 	}
+
+	@Override
+	public String toStringFull() {
+		// TODO Auto-generated method stub
+		return "Peashooter";
+	}
 }

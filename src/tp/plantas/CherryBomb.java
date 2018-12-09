@@ -50,4 +50,9 @@ public class CherryBomb extends Planta {
 	public String infoPlanta(){
 		return "[C]herryBomb: Cost: 50 suncoins Harm: 10 Life: 2\n";
 	}
+
+	@Override
+	public String toStringFull() {
+		return "CherryBomb";
+	}
 }

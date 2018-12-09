@@ -1,5 +1,4 @@
 package tp.p2;
-import java.io.*;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -20,14 +19,17 @@ public class Controller {
 		if (args.length == 2){
 			System.out.println("Semilla: " + args[1]);
 			this.random = new Random(Long.parseLong(args[1]));
+			//this.semilla = random.nextLong();
+			g = new Game(l, random, Long.parseLong(args[1]));
 			
 		}
 		else {
 			System.out.println("Semilla: 0");
 			this.random = new Random(0);
+			//this.semilla = random.nextLong();
+			g = new Game(l, random, 0);
 		}
-		this.semilla = random.nextLong();
-		g = new Game(l, random, Long.parseLong(args[1]));
+		
 		scan = new Scanner(System.in);
 		run(g);
 	}
@@ -53,32 +55,19 @@ public class Controller {
 				comando = parseador.parse(entrada);
 				changeIfPrint(comando.execute(this.g));
 					
-			} catch (ParseException e) {
+			} catch (CommandParseException e) {
 				this.print = false;
 				System.out.println(e.getMessage());
 			
-			} catch(FileContentsException e) {
-				System.out.println(e.getMessage());
-			
-			} catch (FileNotFoundException  e) {
+			} catch (CommandExecuteException e) {
 				this.print = false;
 				System.out.println(e.getMessage());
 			
-			} catch (IOException e) {
-				System.out.println(e.getMessage());
-			
-			} catch (ArrayOutException e) {
-				System.out.println(e.getMessage());
-			
-			} catch (SamePosicionException e) {
-				System.out.println(e.getMessage());
-			
-			} catch (NotAGameObjectException e) {
-				System.out.println(e.getMessage());
-			
-			} catch (IllegalObjectPosition e) {
+			} catch(NumberFormatException e) {
+				this.print = false;
 				System.out.println(e.getMessage());
 			}
+			
 		}
 	}
 	

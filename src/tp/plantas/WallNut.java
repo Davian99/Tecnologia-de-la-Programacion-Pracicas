@@ -40,4 +40,10 @@ public class WallNut extends Planta {
 	public String infoPlanta(){
 		return "[W]allnut: Cost: 50 suncoins Harm: 0 Life: 10\n";
 	}
+
+	@Override
+	public String toStringFull() {
+		// TODO Auto-generated method stub
+		return "WallNut";
+	}
 }

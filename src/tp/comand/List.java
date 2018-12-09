@@ -1,4 +1,5 @@
 package tp.comand;
+import tp.excepciones.CommandParseException;
 import tp.p2.*;
 
 public class List extends Command{
@@ -8,15 +9,15 @@ public class List extends Command{
 	}
 	
 	
-	public Command parse(String argumentos) {	
+	public Command parse(String argumentos) throws CommandParseException {	
 		
 		String[] args = argumentos.split(" ");
 		
-		if(args.length != 1)
-			return null;
-		
 		if (!args[0].equalsIgnoreCase("l") && !args[0].equalsIgnoreCase("list"))
 			return null;
+		
+		if(args.length != 1)
+			throw new CommandParseException("Incorrect number of arguments for list command: [L]ist");
 		
 		return new List();
 	}

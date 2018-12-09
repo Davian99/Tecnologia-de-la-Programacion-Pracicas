@@ -1,6 +1,6 @@
 package tp.comand;
 
-import tp.excepciones.ParseException;
+import tp.excepciones.CommandParseException;
 
 public class CommandParser {
 	
@@ -19,7 +19,7 @@ public class CommandParser {
 	};	
 	
 
-	public Command parse(String instruccion) throws ParseException{
+	public Command parse(String instruccion) throws CommandParseException{
 		Command objetivo = null;
 		int g = 0;
 		while(objetivo == null && g < comandos.length){
@@ -27,7 +27,7 @@ public class CommandParser {
 			g++;
 		}
 		if (objetivo == null)
-			throw new ParseException("No se ha encontrado el comando: " + instruccion);
+			throw new CommandParseException("Unknown command: " + instruccion + ", Use 'help' to see the available commands");
 		else
 			return objetivo;
 	}

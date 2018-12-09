@@ -1,4 +1,5 @@
 package tp.p2;
+import tp.excepciones.CommandParseException;
 import tp.zombies.*;
 
 public class FactoryZombie {
@@ -8,14 +9,17 @@ public class FactoryZombie {
 			new Buckethead()
 	};
 
-	public Zombie parse(String zombie, int x, int y, Game game) {
+	public Zombie parse(String zombie, int x, int y, Game game) throws CommandParseException {
 		Zombie objetivo = null;
 		int i = 0;
 		while(objetivo == null && i < Factory.length) {
 			objetivo = Factory[i].getZombie(zombie, x, y, game);
 			i++;
 		}
-		return objetivo;
+		if (objetivo == null)
+			throw new CommandParseException("No se ha encontrado la planta: " + zombie);
+		else
+			return objetivo;
 	}
 	
 	public String listAll() {

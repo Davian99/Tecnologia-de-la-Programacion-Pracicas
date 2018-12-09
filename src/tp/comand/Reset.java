@@ -1,4 +1,5 @@
 package tp.comand;
+import tp.excepciones.CommandParseException;
 import tp.p2.*;
 
 public class Reset extends Command{
@@ -9,15 +10,15 @@ public class Reset extends Command{
 		
 		
 	@Override
-	public Command parse(String argumentos) {	
-		
+	public Command parse(String argumentos) throws CommandParseException {		
 	
 		String[] args = argumentos.split(" ");
 		
-		if(args.length != 1) 
-			return null;
 		if (!args[0].equalsIgnoreCase("r") && !args[0].equalsIgnoreCase("reset"))
 			return null;
+		
+		if(args.length != 1) 
+			throw new CommandParseException("Incorrect number of arguments for reset command: [R]eset");
 		
 		return new Reset();
 	}

@@ -1,6 +1,9 @@
 package tp.comand;
 
 import java.io.*;
+
+import tp.excepciones.CommandExecuteException;
+import tp.excepciones.CommandParseException;
 import tp.p2.*;
 
 public class Save extends Command{
@@ -17,21 +20,21 @@ public class Save extends Command{
 	}
 		
 	@Override
-	public Command parse(String argumentos) {
+	public Command parse(String argumentos) throws CommandParseException {
 		
 		String[] args = argumentos.split(" ");
 		
-		if(args.length != 2) 
-			return null;
-		
 		if (!args[0].equalsIgnoreCase("s") && !args[0].equalsIgnoreCase("save"))
 			return null;
+		
+		if(args.length != 2) 
+			throw new CommandParseException("Incorrect number of arguments for Save command: [S]ave <nombre archivo>");
 		
 		return new Save(args[1]);	
 	}
 
 	@Override
-	public boolean execute(Game g) throws IOException {
+	public boolean execute(Game g) throws CommandExecuteException {
 		File file = new File(fichero + extension);
 		try {
 			file.createNewFile();
@@ -40,9 +43,9 @@ public class Save extends Command{
 			g.store(bw);
 			bw.write("\n");
 			bw.close();
-			System.out.println("Game successfully saved in file <" + fichero + ">.dat");
+			System.out.println("Game successfully saved in file " + fichero + ".dat");
 		} catch (IOException e) {
-			throw new IOException ("El nombre de archivo introducido no es válido.");
+			throw new CommandExecuteException ("Invalid filename: the filename contains invalid characters.");
 		}
 		return false;
 	}
@@ -50,6 +53,6 @@ public class Save extends Command{
 
 	@Override
 	public String info() {
-		return "[S]ave <nombre archivo>: guarda tu partida en el archivo dado.";
+		return "[S]ave <nombre archivo>: guarda tu partida en el archivo dado.\n";
 	}
 }

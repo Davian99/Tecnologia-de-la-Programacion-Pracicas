@@ -1,20 +1,14 @@
 package tp.comand;
 
-import java.io.IOException;
-
-import tp.excepciones.ArrayOutException;
-import tp.excepciones.FileContentsException;
-import tp.excepciones.IllegalObjectPosition;
-import tp.excepciones.NotAGameObjectException;
-import tp.excepciones.ParseException;
-import tp.excepciones.SamePosicionException;
+import tp.excepciones.CommandExecuteException;
+import tp.excepciones.CommandParseException;
 import tp.p2.*;
 
 public abstract class Command {
 	
-	public abstract Command parse(String argumentos);
+	public abstract Command parse(String argumentos) throws NumberFormatException, CommandParseException;
 	
-	public abstract boolean execute(Game g) throws IOException, FileContentsException, ArrayOutException, SamePosicionException, NotAGameObjectException, IllegalObjectPosition, ParseException;
+	public abstract boolean execute(Game g) throws CommandExecuteException;
 
 	public abstract String info();
 

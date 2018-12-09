@@ -1,5 +1,11 @@
 package tp.comand;
+import tp.excepciones.ArrayOutException;
+import tp.excepciones.CommandExecuteException;
+import tp.excepciones.NoSuncoinsException;
+import tp.excepciones.CommandParseException;
+import tp.excepciones.SamePosicionException;
 import tp.p2.*;
+import tp.plantas.Planta;
 
 public class Add extends Command{
 	private int x;
@@ -17,28 +23,40 @@ public class Add extends Command{
 	}
 		
 	@Override
-	public Command parse(String argumentos) {	
+	public Command parse(String argumentos) throws NumberFormatException, CommandParseException {	
 		
 	// cambio a por X texto
 		String[] args = argumentos.split(" ");
 		
-		if(args.length != 4) 
-			return null;
-		
 		if (!args[0].equalsIgnoreCase("a") && !args[0].equalsIgnoreCase("add"))
 			return null;
 		
-		return new Add(args[1], Integer.valueOf(args[2]), Integer.valueOf(args[3]));
+		if(args.length != 4) 
+			throw new CommandParseException("Incorrect number of arguments for add command: [A]dd <plant><x><y>");
+		
+		try{
+			return new Add(args[1], Integer.valueOf(args[2]), Integer.valueOf(args[3]));
+		}catch(NumberFormatException e){
+			throw new NumberFormatException("Invalid argument for add command, number expected, introduced: "+args[2]+ " " +args[3]);
+		}
 	}
 
 	@Override
-	public boolean execute(Game g) {
-		if (g.addPlanta(planta, x, y)) {
-			g.update();
-			return true;
+	public boolean execute(Game g) throws CommandExecuteException {
+		
+		FactoryPlanta parseador = new FactoryPlanta();
+		Planta p;
+		
+		try {
+			p = parseador.parse(this.planta, x, y, g);
+		} catch (CommandParseException e) {
+			throw new CommandExecuteException(e.getMessage());
 		}
-		else
-			return false;
+		try {
+			return g.addPlanta(p, x, y);
+		} catch (ArrayOutException | NoSuncoinsException | SamePosicionException e) {
+			throw new CommandExecuteException(e.getMessage());
+		}
 			
 	}
 
