@@ -42,6 +42,7 @@ public abstract class ActiveGameObject extends GameObject{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
 	}
+	
+	abstract public int valor();
 }

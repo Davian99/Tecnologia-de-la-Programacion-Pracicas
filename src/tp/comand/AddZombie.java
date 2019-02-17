@@ -5,18 +5,18 @@ import tp.excepciones.NoSuncoinsException;
 import tp.excepciones.CommandParseException;
 import tp.excepciones.SamePosicionException;
 import tp.p2.*;
-import tp.plantas.Planta;
+import tp.zombies.*;
 
-public class Add extends Command{
+public class AddZombie extends Command{
 	private int x;
 	private int y;
 	private String planta;
 		
-	public Add(){
+	public AddZombie(){
 		
 	}
 	
-	public Add(String planta, int x, int y){
+	public AddZombie(String planta, int x, int y){
 		this.x = x;
 		this.y = y;
 		this.planta = planta;
@@ -28,15 +28,15 @@ public class Add extends Command{
 	// cambio a por X texto
 		String[] args = argumentos.split(" ");
 		
-		if (!args[0].equalsIgnoreCase("a") && !args[0].equalsIgnoreCase("add"))
+		if (!args[0].equalsIgnoreCase("az") && !args[0].equalsIgnoreCase("addzombie"))
 			return null;
 		
 		if(args.length != 4) 
-			throw new CommandParseException("Incorrect number of arguments for add command: [A]dd <plant><x><y>");
+			throw new CommandParseException("Incorrect number of arguments for addzombie command: [A]dd[Z]ombie <zombie><x><y>");
 		
 		try{
-			return new Add(args[1], Integer.valueOf(args[2]), Integer.valueOf(args[3]));
-		}catch(NumberFormatException e){
+			return new AddZombie(args[1], Integer.valueOf(args[2]), Integer.valueOf(args[3]));
+		} catch(NumberFormatException e){
 			throw new NumberFormatException("Invalid argument for add command, number expected, introduced: "+args[2]+ " " +args[3]);
 		}
 	}
@@ -44,20 +44,16 @@ public class Add extends Command{
 	@Override
 	public boolean execute(Game g) throws CommandExecuteException {
 		
-		FactoryPlanta parseador = new FactoryPlanta();
-		Planta p;
-		
+		FactoryZombie parseador = new FactoryZombie();
+		Zombie z;
 		try {
-			p = parseador.parse(this.planta, x, y, g);
+			z = parseador.parse(this.planta, x, y, g);
 		} catch (CommandParseException e) {
 			throw new CommandExecuteException(e.getMessage());
 		}
 		try {
-			if (g.addPlanta(p, x, y)) {
-				g.update();
-				return true;
-			}
-			return false;
+			g.update();
+			return g.addZombie(z, x, y);
 		} catch (ArrayOutException | NoSuncoinsException | SamePosicionException e) {
 			throw new CommandExecuteException(e.getMessage());
 		} catch (CommandParseException e) {
@@ -69,6 +65,6 @@ public class Add extends Command{
 	}
 
 	public String info(){
-		return "[A]dd <plant><x><y>: Añade una planta en la posicion dada\n";
+		return "[A]dd[Z]ombie <zombie><x><y>: Añade un Zombie en la posicion dada\n";
 	}
 }

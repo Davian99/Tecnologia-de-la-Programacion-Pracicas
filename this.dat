@@ -1,8 +1,8 @@
 Plants Vs Zombies v3.0
-cycle: 6
-sunCoins: 50
-level: HARD
-remZombies: 4
-activelist:
-pasiveList: *:2:7
+cycle: 7
+sunCoins: 950
+level: UNLIMITED
+remZombies: 998
+activelist: P:5:1:0:0, R:2:3:4:1
+pasiveList: *:3:5
 

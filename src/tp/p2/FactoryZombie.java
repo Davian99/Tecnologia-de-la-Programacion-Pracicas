@@ -6,7 +6,11 @@ public class FactoryZombie {
 	Zombie[] Factory = {
 			new Runner(),
 			new CommonZombie(),
-			new Buckethead()
+			new Buckethead(),
+			new Acrobat(),
+			new HijoePuta(),
+			new Mage(),
+			new Cannibal()
 	};
 
 	public Zombie parse(String zombie, int x, int y, Game game) throws CommandParseException {
@@ -17,7 +21,7 @@ public class FactoryZombie {
 			i++;
 		}
 		if (objetivo == null)
-			throw new CommandParseException("No se ha encontrado la planta: " + zombie);
+			throw new CommandParseException("No se ha encontrado el zombie: " + zombie);
 		else
 			return objetivo;
 	}

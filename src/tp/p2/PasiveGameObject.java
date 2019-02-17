@@ -9,4 +9,6 @@ public abstract class PasiveGameObject extends GameObject{
 	public PasiveGameObject() {
 		
 	}
+	
+	public abstract String toStringFull();
 }

@@ -15,13 +15,21 @@ public class CommandParser {
 			new ZombieList(),
 			new Catch(),
 			new Save(),
-			new Load()
+			new Load(),
+			new AddSuncoins(),
+			new AddZombie(),
+			new GoTo(),
+			new Kill()
 	};	
 	
 
 	public Command parse(String instruccion) throws CommandParseException{
 		Command objetivo = null;
 		int g = 0;
+		String[] args = instruccion.split(" ");
+		if(args.length == 0) 
+			return new None();
+		
 		while(objetivo == null && g < comandos.length){
 			objetivo = comandos[g].parse(instruccion);
 			g++;
