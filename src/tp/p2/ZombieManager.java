@@ -18,12 +18,21 @@ public class ZombieManager {
 			this.zombiesLeft = 5;
 			this.prob = 0.2f;
 			break;
-			default:   
+			case INSANE:   
 			this.zombiesLeft = 10;
+			this.prob = 0.3f;
+			break;
+			case UNLIMITED: //Mas o menos
+			this.zombiesLeft = 1000;
 			this.prob = 0.3f;
 		}
 	}
 	
+	public ZombieManager(ZombieManager gz) {
+		this.zombiesLeft = gz.zombiesLeft;
+		this.prob = gz.prob;
+	}
+
 	public void setZombies(int c) {
 		this.zombiesLeft = c;
 	}

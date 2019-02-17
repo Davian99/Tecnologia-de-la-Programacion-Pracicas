@@ -11,14 +11,18 @@ import tp.excepciones.NoSuncoinsException;
 import tp.excepciones.CommandParseException;
 import tp.excepciones.FileContentsException;
 import tp.excepciones.SamePosicionException;
+import tp.pasives.GraveStone;
+import tp.pasives.Sun;
+import tp.pasives.Water;
 import tp.plantas.*;
 
-public class Game {
+public class Game{
 	private boolean exit = false;
 	private int cicleCount;
 	private Random generador;
 	private Level nivel;
 	private ListaGameObject listaObjetos;
+	private ListaPasiveObject listaPasivos;
 	private ZombieManager generadorZombie;
 	private DebugPrinter pantallaD;
 	private ReleasePrinter pantallaR;
@@ -27,6 +31,7 @@ public class Game {
 	private PrintMode printMode;
 	private boolean catchSun;
 	private long seed;
+	private int n_zombie = 6;
 	
 	//Constructora para cuando tenemos una semilla.
 	public Game(Level nivel, Random r, long semilla) {
@@ -37,20 +42,59 @@ public class Game {
 	
 	//Constructora con semilla por defecto.
 	public Game(Level nivel) {
-		this.tamx = 4;
-		this.tamy = 8;
+		this.tamx = 8;
+		this.tamy = 20;
 		this.nivel = nivel;
 		cicleCount = 0;
 		setGenerador(new Random());
 		listaObjetos = new ListaGameObject(5);
+		listaPasivos = new ListaPasiveObject();
 		generadorZombie = new ZombieManager(nivel);
 		pantallaR = new ReleasePrinter(tamx, tamy, 50);
 		pantallaD = new DebugPrinter(tamx, tamy, 50);
 		monedas = new SuncoinManager(50);
 		printMode = PrintMode.RELEASE;
 		this.setCatchSun(false);
+		this.addGraves();
+		this.addWater();
 	}
 	
+	private void addWater() {
+		int t = this.tamx * this.tamy / 20;
+		int x, y;
+		for (int i = 0; i < t; ++i) {
+			boolean done = false;
+			while(!done) {
+				y = this.generador.nextInt(tamy-2)+1;
+				x = this.generador.nextInt(this.tamx);
+				if (!this.listaPasivos.estaEnCasilla(x, y)) {
+					PasiveGameObject pgc = new Water(x, y, this);
+					this.listaPasivos.aniadirObjeto(pgc);
+					done = true;
+				}
+			}
+		}
+		
+	}
+
+	private void addGraves() {
+		int t = this.tamx * this.tamy / 20;
+		int x, y;
+		for (int i = 0; i < t; ++i) {
+			boolean done = false;
+			while(!done) {
+				y = this.generador.nextInt(tamy - 2) + 1;
+				x = this.generador.nextInt(this.tamx);
+				if (!this.listaPasivos.estaEnCasilla(x, y)) {
+					PasiveGameObject pgc = new GraveStone(x, y, this, this.generador.nextInt(3) + 3);
+					this.listaPasivos.aniadirObjeto(pgc);
+					done = true;
+				}
+			}
+		}
+		
+	}
+
 	public Game() {
 		this.tamx = 4;
 		this.tamy = 8;
@@ -62,17 +106,42 @@ public class Game {
 		this.setCatchSun(false);
 	}
 	
+	public Game(Game g) {
+		this.tamx = g.tamx;
+		this.tamy = g.tamy;
+		this.nivel = g.nivel;
+		this.cicleCount = g.cicleCount;
+		this.generador = g.generador;
+		
+		//Esto da problemas evidentemente
+		this.listaObjetos = new ListaGameObject(g.listaObjetos, this);
+		this.listaPasivos = new ListaPasiveObject(g.listaPasivos, this);
+		
+		this.generadorZombie = new ZombieManager(g.generadorZombie);
+		this.pantallaR = new ReleasePrinter(tamx, tamy, 50);
+		this.pantallaD = new DebugPrinter(tamx, tamy, 50);
+		this.monedas = new SuncoinManager(g.monedas);
+		this.printMode = g.printMode;
+		this.setCatchSun(false);
+	}
+
 	//Hace el update del juego, osea hace la ejecución de un turno.
 	public void update() throws CommandParseException {
 		
 		//Hacemos el update de todos los objetos de la lista, llamando a un update que se 
 		//Sobreescribe por el update de cada subclase
 		for (int j = 0; j < listaObjetos.getElementos(); j++) {
+
 			this.listaObjetos.obtenerPos(j).update();
-		}		
+		}
 		//Generacion de zombies
-		int zombie = this.getGenerador().nextInt(3);
-		addZombie(generarTipoZombie(zombie));
+		int zombie = this.getGenerador().nextInt(this.n_zombie);
+		if(this.generadorZombie.numZombies() != 1) {
+			addZombie(generarTipoZombie(zombie));
+		} else {
+			addZombie("C");
+		}
+		
 		
 		//Update de los suns
 		this.monedas.update(this);
@@ -86,8 +155,12 @@ public class Game {
 		return this.cicleCount;
 	}
 	
-	public void eliminarObjeto(int x, int y) {
-		this.listaObjetos.eliminarObjeto(x, y);
+	public void turno(int t) {
+		this.cicleCount = t;
+	}
+	
+	public int eliminarObjeto(int x, int y) {
+		return this.listaObjetos.eliminarObjeto(x, y);
 	}
 	
 	//Metodo auxiliar para Controller que se utiliza para saber si gana alguien la partida y quien.
@@ -113,17 +186,28 @@ public class Game {
 	
 	//Metodo que se utiliza en update de Peashooter para ver si existe algun  zombie en su fila y golpearlo
 	//Si la vida del zombie llega a 0 tambien lo mata.
-	public void atacarZombies(int x, int y, int dmg) {
+	public void atacarZombies(int x, int y, int dmg, int dir, boolean toEnd) {
 		GameObject gc;
-		for (int i = y+1; i < 8; ++i) {
-			if(this.listaObjetos.estaEnCasilla(x, i)) {
+		PasiveGameObject pgo;
+		int i;
+		
+		if (dir > 0)
+			i = y + 1;
+		else
+			i = y - 1;
+		
+		for (; i < this.tamy && i >= 0; i += dir) {
+			if(this.listaPasivos.estaEnCasilla(x, i) || this.listaObjetos.estaEnCasilla(x, i)) {
 				gc = this.listaObjetos.obtenerBoard(x, i);
+				pgo = this.listaPasivos.getObjeto(x, i);
+				if (pgo != null && pgo instanceof GraveStone)
+					return;
 				if(gc instanceof Zombie) {
 					if (gc.muere(dmg)) {
 						this.listaObjetos.eliminarObjeto(x, i);
 					}
-						
-					return;
+					if (!toEnd)	
+						return;
 				}
 			}
 		}
@@ -145,7 +229,7 @@ public class Game {
 	}
 	
 	//Metodo que utilizan los zombies para atacar a las plantas.
-	public void atacarPlanta(int x, int y, int fuerza) {
+	public int atacarPlanta(int x, int y, int fuerza) {
 		GameObject gc;
 		if(this.listaObjetos.estaEnCasilla(x, y)) {
 			gc = this.listaObjetos.obtenerBoard(x, y);
@@ -153,25 +237,30 @@ public class Game {
 				if (gc.muere(fuerza)) {
 					this.listaObjetos.eliminarObjeto(x, y);
 				}
-				return;
+				if(gc instanceof SpikeWall) {
+					return 1;
+				}
+				return 0;
 			}
-			return;
+			return 0;
 		}
-		return;
+		return 0;
 	}
 	
-	public void atacarZombiePos(int x, int y, int dmg) {
+	public boolean atacarZombiePos(int x, int y, int dmg) {
 		GameObject gc;
 		if(this.listaObjetos.estaEnCasilla(x, y)) {
 			gc = this.listaObjetos.obtenerBoard(x, y);
 			if(gc instanceof Zombie) {
 				if (gc.muere(dmg)) {
 					this.listaObjetos.eliminarObjeto(x, y);
+					return true;
 				}
 					
-				return;
+				return false;
 			}
 		}
+		return false;
 	}
 	
 	//Metodo auxiliar que hace que el controller printe el tablero.
@@ -221,7 +310,7 @@ public class Game {
 		if (x >= this.tamx || x < 0 || y >= this.tamy-1 || y < 0) {
 			throw new ArrayOutException("Failed to add " + p.toStringFull() + ": (" + x + ", " + y + ") is an invalid position.");
 		}
-		if(this.casillaVacia(x, y)) {
+		if (this.casillaVacia(x, y)) {
 				if (this.suficientesSuncoins(p.getCoste())) {
 					this.listaObjetos.aniadirPlanta(p);
 					return true;
@@ -241,20 +330,39 @@ public class Game {
 		FactoryZombie parseador = new FactoryZombie();
 		Zombie z;
 		boolean salida = false;
+		int cont = 0;
 		
 		if (generadorZombie.isZombieAdded(this.getGenerador())) {
-			int pos = this.getGenerador().nextInt(4);
+			int pos = this.getGenerador().nextInt(this.tamx);
 			while(!salida){
-				
-				if(casillaVacia(pos, 7)) {
-					z = parseador.parse(zombie, pos, 7, this);
+				if(casillaVacia(pos, this.tamy-1)) {
+					z = parseador.parse(zombie, pos, this.tamy-1, this);
 					this.listaObjetos.aniadirZombie(z);
 					salida = true;
 				}
-				else pos = this.getGenerador().nextInt(4);
+				else pos = this.getGenerador().nextInt(this.tamx);
+				cont++;
+				if (cont == this.tamx-1) {
+					salida = true;
+				}
+					
 			}
 		}
 	}
+	
+	public boolean addZombie(Zombie z, int x, int y) throws ArrayOutException, NoSuncoinsException, SamePosicionException {
+		
+		if (x >= this.tamx || x < 0 || y >= this.tamy || y < 0) {
+			throw new ArrayOutException("Failed to add " + z.toString() + ": (" + x + ", " + y + ") is an invalid position.");
+		}
+		if(this.casillaVacia(x, y)) {
+			this.listaObjetos.aniadirZombie(z);
+			return true;
+		}
+		throw new SamePosicionException("Failed to add " + z.toString() + ":  position (" + x + ", " + y + ") is already occupied.");
+	}
+	
+	
 	
 	public String generarTipoZombie(int zombie){
 		
@@ -268,8 +376,17 @@ public class Game {
 		case 1:
 			tipoZombie = "b";
 			break;
-		default:
+		case 2:
 			tipoZombie = "r";
+			break;
+		case 3:
+			tipoZombie = "a";
+			break;
+		case 4:
+			tipoZombie = "hp";
+			break;
+		case 5:
+			tipoZombie = "m";
 			break;
 		}
 		
@@ -378,28 +495,38 @@ public class Game {
 			//Ciclo
 			aux = br.readLine();
 			args = aux.split(" ");
+			if (!args[0].equals("cycle:"))
+				throw new FileContentsException("Load failed: invalid file contents");
 			g.cicleCount = Integer.parseInt(args[1]);
 			
 			//Monedas
 			aux = br.readLine();
 			args = aux.split(" ");
+			if (!args[0].equals("sunCoins:"))
+				throw new FileContentsException("Load failed: invalid file contents");
 			g.monedas = new SuncoinManager(Integer.parseInt(args[1]));
 			
 			//Level
 			aux = br.readLine();
 			args = aux.split(" ");
 			g.nivel = Level.valueOf(args[1].toUpperCase());
+			if (!args[0].equals("level:"))
+				throw new FileContentsException("Load failed: invalid file contents");
 			g.generadorZombie = new ZombieManager(g.nivel);
 		
 			//Zombies restantes
 			aux = br.readLine();
 			args = aux.split(" ");
+			if (!args[0].equals("remZombies:"))
+				throw new FileContentsException("Load failed: invalid file contents");
 			g.generadorZombie.setZombies(Integer.parseInt(args[1]));
 			
 			//Lista de objetos activos
 			ListaGameObject lgo = new ListaGameObject(5);
 			aux = br.readLine();
 			args = aux.split(" ");
+			if (!args[0].equals("activelist:"))
+				throw new FileContentsException("Load failed: invalid file contents");
 			if (args.length > 1) {
 				int i = 1;
 				Planta p;
@@ -447,6 +574,8 @@ public class Game {
 			//Soles en tablero
 			aux = br.readLine();
 			args = aux.split(" ");
+			if (!args[0].equals("pasiveList:"))
+				throw new FileContentsException("Load failed: invalid file contents");
 			if (args.length > 1) {
 				int i1 = 1;
 				while (i1 < args.length) {
@@ -476,10 +605,24 @@ public class Game {
 		} catch(ArrayIndexOutOfBoundsException aioobe) {
 			throw new FileContentsException("Load failed: invalid file contents");
 		
+		} catch (NullPointerException e) {
+			throw new FileContentsException("Load failed: invalid file contents");
 		}
 	}
 	
 	public void terminar() {
 		this.exit = true;
+	}
+	
+	public int getTamY() {
+		return this.tamy;
+	}
+
+	public boolean hayPlantas() {
+		return this.listaObjetos.hayPlantas();
+	}
+
+	public PasiveGameObject getPGO(int i, int j) {
+		return this.listaPasivos.getObjeto(i, j);
 	}
 }

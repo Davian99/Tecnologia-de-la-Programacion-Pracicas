@@ -32,7 +32,7 @@ public class WallNut extends Planta {
 	}
 	
 	public WallNut getPlanta(String name, int x, int y, Game g) {
-		if ((name.equalsIgnoreCase("w") || name.equalsIgnoreCase("wallnut")) && g.suficientesSuncoins(this.coste))
+		if ((name.equalsIgnoreCase("w") || name.equalsIgnoreCase("wallnut")))
 				return new WallNut(x, y, g);
 		return null;
 	}

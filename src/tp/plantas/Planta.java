@@ -17,6 +17,10 @@ public abstract class Planta extends ActiveGameObject{
 		return this.coste;
 	}
 	
+	public int valor() {
+		return this.coste/2;
+	}
+	
 	public abstract Planta getPlanta(String name, int x, int y, Game g);
 
 	public abstract String infoPlanta();

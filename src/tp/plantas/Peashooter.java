@@ -21,7 +21,7 @@ public class Peashooter extends Planta{
 	
 	//Metodo que hace el update de peashooter.
 	public void update(){
-		this.game.atacarZombies(this.x, this.y, this.damage);
+		this.game.atacarZombies(this.x, this.y, this.damage, 1, false);
 		this.turno++;
 	}
 	
@@ -37,8 +37,7 @@ public class Peashooter extends Planta{
 	
 	public Peashooter getPlanta(String name, int x, int y, Game g) {
 		if (name.equalsIgnoreCase("p") || name.equalsIgnoreCase("peashooter")) {
-			if (g.suficientesSuncoins(this.coste))
-				return new Peashooter(x, y, g);	
+			return new Peashooter(x, y, g);	
 		}
 		return null;
 	}

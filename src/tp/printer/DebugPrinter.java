@@ -1,6 +1,7 @@
 package tp.printer;
 
 import tp.p2.*;
+import tp.pasives.Sun;
 
 public class DebugPrinter extends BoardPrinter implements GamePrinter{
 

@@ -1,5 +1,6 @@
 package tp.excepciones;
 
+@SuppressWarnings("serial")
 public class NotAGameObjectException extends Exception{
 
 	

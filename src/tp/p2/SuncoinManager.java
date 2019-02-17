@@ -3,6 +3,8 @@ package tp.p2;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
+import tp.pasives.Sun;
+
 public class SuncoinManager {
 
 	private int suncoins;
@@ -16,6 +18,14 @@ public class SuncoinManager {
 		n_elementos = 0;
 	}
 	
+	public SuncoinManager(SuncoinManager m) {
+		this.suncoins = m.suncoins;
+		this.n_elementos = m.n_elementos;
+		Suns = new Sun[32];
+		for(int i = 0; i < m.n_elementos; ++i)
+			this.Suns[i] = m.Suns[i];
+	}
+
 	public void setSuncoins(int m) {
 		this.suncoins = m;
 	}

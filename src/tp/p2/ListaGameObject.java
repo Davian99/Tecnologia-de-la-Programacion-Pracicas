@@ -3,6 +3,7 @@ package tp.p2;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
+import tp.excepciones.CommandParseException;
 import tp.plantas.Planta;
 import tp.zombies.Zombie;
 
@@ -18,11 +19,45 @@ public class ListaGameObject {
 		this.n_elementos = 0;
 	}
 	
-	
+	public ListaGameObject(ListaGameObject l, Game g) {
+		this.n_elementos = l.n_elementos;
+		this.max_elementos = l.max_elementos;
+		this.listaobjetos = new ActiveGameObject[max_elementos];
+		
+		FactoryPlanta p_parse = new FactoryPlanta();
+		FactoryZombie z_parse = new FactoryZombie();
+		Planta p;
+		Zombie z;
+		
+		for(int i = 0; i < l.n_elementos; ++i) {
+			if (l.listaobjetos[i] instanceof Planta) {
+				try {
+					p = p_parse.parse(l.listaobjetos[i].Symbol, l.listaobjetos[i].x, l.listaobjetos[i].y, g);
+					p.turno = l.listaobjetos[i].turno;
+					this.listaobjetos[i] = p;
+				} catch (CommandParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+			} else if (l.listaobjetos[i] instanceof Zombie) {
+				try {
+					z = z_parse.parse(l.listaobjetos[i].Symbol, l.listaobjetos[i].x, l.listaobjetos[i].y, g);
+					z.turno = l.listaobjetos[i].turno;
+					this.listaobjetos[i] = z;
+				} catch (CommandParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		return;
+	}
+
+
 	public int getElementos() {
 		return n_elementos;
 	}
-	
 	
 	public boolean maxAlcanzado() {
 		return n_elementos == max_elementos;
@@ -106,17 +141,21 @@ public class ListaGameObject {
 		}
 	}
 
-	public void eliminarObjeto(int x, int y) {
-		int pos = 0;
+	public int eliminarObjeto(int x, int y) {
+		int pos = -1, valor;
 		for (int i = 0; i < n_elementos; ++i) {
 			if (listaobjetos[i].getX() == x && listaobjetos[i].getY() == y)
 				pos = i;
 		}
+		if(pos == -1)
+			return 0;
 		
+		valor = listaobjetos[pos].valor();
 		this.n_elementos--;
 		for (int i = pos; i < this.n_elementos; ++i)
 			this.listaobjetos[i] = this.listaobjetos[i+1];
 		
+		return valor;
 	}
 
 
@@ -135,45 +174,12 @@ public class ListaGameObject {
 		
 		
 	}
+
+	public boolean hayPlantas() {
+		for (int i = 0; i < this.n_elementos; ++i) {
+			if (this.listaobjetos[i] instanceof Planta)
+				return true;
+		}
+		return false;
+	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

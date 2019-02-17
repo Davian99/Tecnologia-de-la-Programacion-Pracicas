@@ -7,7 +7,12 @@ public class FactoryPlanta {
 			new Sunflower(),
 			new Peashooter(),
 			new CherryBomb(),
-			new WallNut()
+			new WallNut(),
+			new Threepeater(),
+			new SplitPea(),
+			new LaserBean(),
+			new Smasher(),
+			new SpikeWall()
 	};
 
 	public Planta parse(String planta, int x, int y, Game game) throws CommandParseException {

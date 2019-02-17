@@ -30,8 +30,5 @@ public abstract class GameObject {
 	public Boolean esta(int x, int y) {
 		return (this.x == x && this.y == y);
 	}
-	
-	
-	
-	
+		
 }

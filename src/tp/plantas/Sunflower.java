@@ -11,6 +11,11 @@ public class Sunflower extends Planta{
 		super(x, y, 1, game, "S");
 		this.coste = 20;
 	}
+	
+	public Sunflower(GameObject go, Game game) {
+		super(go.getX(), go.getY(), 1, game, "S");
+		this.coste = 20;
+	}
 
 	public Sunflower() {
 		// TODO Auto-generated constructor stub
@@ -34,7 +39,7 @@ public class Sunflower extends Planta{
 	}
 	
 	public Sunflower getPlanta(String name, int x, int y, Game g) {
-		if ((name.equalsIgnoreCase("s") || name.equalsIgnoreCase("sunflower")) && g.suficientesSuncoins(this.coste)) 
+		if ((name.equalsIgnoreCase("s") || name.equalsIgnoreCase("sunflower"))) 
 				return new Sunflower(x, y, g);
 		return null;
 	}
